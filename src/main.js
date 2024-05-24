@@ -10,7 +10,7 @@ import axios from 'axios';
 
 // axios config
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-axios.defaults.baseURL = import.meta.env.VITE_VUE_APP_DEV_API;
+axios.defaults.baseURL = import.meta.env.VITE_VUE_APP_PROD_API;
 
 const app = createApp(App)
 

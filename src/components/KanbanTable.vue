@@ -1,11 +1,11 @@
 <template>
   <div id="kanban-table-component">
-    <div id="titles-container" ref="titlesContainer" @scroll="handleScroll">
+    <div id="titles-container" ref="titlesContainer" @scroll="followColumnsScroll">
       <div id="title-box" v-for="item in categoryColumns" :key="item.id">
         {{ item.column_name }}
       </div>
     </div>
-    <div id="columns-container">
+    <div id="columns-container" ref="columnsContainer" @scroll="followTitlesScroll">
       <div id="title-column" v-for="item in categoryColumns" :key="item.id">
         {{ item.column_name }}
       </div>
@@ -19,15 +19,18 @@ import axios from 'axios';
 
 const categoryColumns = ref([]);
 const titlesContainer = ref(null)
+const columnsContainer = ref(null)
 
 const getCategoryMovieColumns = async () => {
   const response = await axios('/movie_category_columns');
   categoryColumns.value = response.data;
 }
 
-const handleScroll = () => {
-  const leftScroll = titlesContainer.value.leftScroll;
-  console.log('LEFT SCROLL', leftScroll);
+const followTitlesScroll = () => {
+  titlesContainer.value.scrollLeft = columnsContainer.value.scrollLeft;
+}
+const followColumnsScroll = () => {
+  columnsContainer.value.scrollLeft = titlesContainer.value.scrollLeft;
 }
 
 onMounted(() => {
@@ -50,7 +53,7 @@ onMounted(() => {
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
-  border: 1px solid red;
+  scrollbar-width: none;
 }
 #title-box {
   display: inline-block;
@@ -65,6 +68,7 @@ onMounted(() => {
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
+  scrollbar-width: none;
 }
 #title-column {
   display: inline-block;
