@@ -1,10 +1,16 @@
+// assets
 import './assets/main.css'
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-
+// main files
 import App from './App.vue'
 import router from './router'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import axios from 'axios';
+
+// axios config
+axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+axios.defaults.baseURL = import.meta.env.VITE_VUE_APP_DEV_API;
 
 const app = createApp(App)
 
