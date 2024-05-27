@@ -1,20 +1,21 @@
 <template>
   <div id="kanban-table-component">
     <div id="titles-container" ref="titlesContainer" @scroll="followColumnsScroll">
-      <div id="title-box" v-for="column in categoryColumns" :key="column._id">
+      <div class="title-box" v-for="column in categoryColumns" :key="column._id">
         {{ column.column_name }}
       </div>
     </div>
     <div id="columns-container" ref="columnsContainer" @scroll="followTitlesScroll">
-      <div id="title-column" v-for="column in categoryColumns" :key="column._id">
-        <div v-if="!reactiveState.movieCards[column.column] || reactiveState.movieCards[column.column].length === 0">
+      <div class="movie-column" v-for="column in categoryColumns" :key="column._id">
+        <div v-if="!reactiveState.movieCards[column.column] || reactiveState.movieCards[column.column].length === 0" class="no-showing-cards-message">
           <span>No cards to show</span>
         </div>
         <div v-else>
-          <div v-for="movieCard in reactiveState.movieCards[column.column]" :key="movieCard._id">
-            <p>{{ movieCard.name }}</p>
-            <p>{{ movieCard.category }}</p>
-          </div>
+          <kanban-card 
+            v-for="movieCard in reactiveState.movieCards[column.column]" 
+            :key="movieCard._id" 
+            :movie-card="movieCard"
+          />
         </div>
       </div>
     </div>
@@ -22,6 +23,7 @@
 </template>
 
 <script setup>
+import KanbanCard from './KanbanCard.vue'
 import { onMounted, ref, reactive } from 'vue';
 import axios from 'axios';
 
@@ -40,13 +42,11 @@ const getCategoryMovieColumns = async () => {
 const getFilteredMovieCards = () => {
   categoryColumns.value.forEach(async (column) => {
     const response = await axios(`/movies?category=${column.column}`);
-  
-    for (const cardsSet in reactiveState) {
-      if (Object.prototype.hasOwnProperty.call(Object, reactiveState.movieCards, cardsSet)) {
-        return;
-      } else {
-        reactiveState.movieCards[column.column] = response.data;
-      }
+
+    if (Object.prototype.hasOwnProperty.call(Object, reactiveState.movieCards, column)) {
+      return;
+    } else {
+      reactiveState.movieCards[column.column] = response.data;
     }
   });
 }
@@ -80,26 +80,35 @@ onMounted(() => {
   white-space: nowrap;
   scrollbar-width: none;
 }
-#title-box {
+.title-box {
   display: inline-block;
   width: 300px;
   height: 100%;
-  background: grey;
-  border: 1px solid #000;
+  text-align: center;
+  padding-top: 5px;
+  font-size: 15px;
+  font-weight: bold;
+  border: 2px solid #424247;
 }
 #columns-container {
+  display: flex;
   width: 100%;
   height: 95%;
-  overflow-x: scroll;
-  overflow-y: hidden;
-  white-space: nowrap;
-  scrollbar-width: none;
+  overflow: scroll;
+  border: 1px solid #424247;
 }
-#title-column {
-  display: inline-block;
+.movie-column {
   width: 300px;
-  height: 100%;
-  background: grey;
-  border: 1px solid #000;
+  height: 90%;
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+.no-showing-cards-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90%; 
+  height: 10%;
+  margin-left: 5%;
 }
 </style>
