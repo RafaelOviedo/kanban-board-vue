@@ -22,5 +22,9 @@ const props = defineProps(['movieCard'])
   margin-bottom: 15px;
   background: #424247;
   border-radius: 15px;
+  cursor: pointer;
+}
+#kanban-card-component:hover {
+  background: #54545B;
 }
 </style>

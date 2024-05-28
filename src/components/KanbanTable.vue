@@ -1,12 +1,12 @@
 <template>
   <div id="kanban-table-component">
     <div id="titles-container" ref="titlesContainer" @scroll="followColumnsScroll">
-      <div class="title-box" v-for="column in categoryColumns" :key="column._id">
+      <div class="title-box" v-for="column in categoryColumns" :key="column._id" :style="showWhenFiltering(column)">
         {{ column.column_name }}
       </div>
     </div>
     <div id="columns-container" ref="columnsContainer" @scroll="followTitlesScroll">
-      <div class="movie-column" v-for="column in categoryColumns" :key="column._id">
+      <div class="movie-column" v-for="column in categoryColumns" :key="column._id" :style="showWhenFiltering(column)">
         <div v-if="!reactiveState.movieCards[column.column] || reactiveState.movieCards[column.column].length === 0" class="no-showing-cards-message">
           <span>No cards to show</span>
         </div>
@@ -24,8 +24,16 @@
 
 <script setup>
 import KanbanCard from './KanbanCard.vue'
-import { onMounted, ref, reactive } from 'vue';
+import { onMounted, ref, reactive, computed } from 'vue';
 import axios from 'axios';
+
+const props = defineProps({
+  filtersValue: {
+    type: Array,
+    default: () => []
+  }
+})
+const emit = defineEmits(['set-movies-categories']);
 
 const reactiveState = reactive({ movieCards: {} });
 
@@ -49,6 +57,8 @@ const getFilteredMovieCards = () => {
       reactiveState.movieCards[column.column] = response.data;
     }
   });
+
+  emit('set-movies-categories', categoryColumns.value);
 }
 
 const followTitlesScroll = () => {
@@ -57,6 +67,19 @@ const followTitlesScroll = () => {
 const followColumnsScroll = () => {
   columnsContainer.value.scrollLeft = titlesContainer.value.scrollLeft;
 }
+
+const showWhenFiltering = computed(() => {
+  return (column) => {
+    if (!props.filtersValue.length) {
+      return {};
+    }
+    else if (!props.filtersValue.includes(column.column)) {
+      return { display: 'none' };
+    } else {
+      return {};
+    }
+  }
+});
 
 onMounted(() => {
   getCategoryMovieColumns();
